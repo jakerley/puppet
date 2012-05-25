@@ -21,6 +21,17 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
     )
   end
 
+  def setup_password()
+    ca = mock('ca')
+    Puppet::SSL::CertificateAuthority.stubs(:new).returns ca
+    Puppet::SSL::CertificateAuthority.stubs(:instance).returns ca
+    Puppet.settings.stubs(:value).with(:ca).returns('ca')            
+    Puppet.settings.stubs(:value).with(:caexplicitpassword).returns 'true'
+    Puppet::Util::Password_utils.expects(:capturepassword).returns('123456')
+    Puppet::SSL::Ca_password.expects(:password=).with('123456')
+    ca
+  end
+  
   def make_certs(csr_names, crt_names)
     Array(csr_names).map do |name|
       Puppet::SSL::Host.new(name).generate_certificate_request
@@ -34,6 +45,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#verify" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:verify) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should not explode if there is no certificate" do
       expect {
         subject.verify('random-host').should == {
@@ -86,6 +103,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#fingerprint" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:fingerprint) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+    @ca = setup_password()
+    @ca.expects(:verify)    
+    subject.verify('random-host')            
+  end
+
     it "should have a 'digest' option" do
       action.should be_option :digest
     end
@@ -125,6 +148,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#print" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:print) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should not explode if there is no certificate" do
       expect {
         subject.print('random-host').should be_nil
@@ -151,6 +180,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#sign" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:sign) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should not explode if there is no CSR" do
       expect {
         subject.sign('random-host').
@@ -202,6 +237,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#generate" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:generate) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should generate a certificate if requested" do
       subject.list(:all => true).should == []
 
@@ -241,6 +282,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#revoke" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:revoke) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should not explode when asked to revoke something that doesn't exist" do
       expect { subject.revoke('nonesuch') }.should_not raise_error
     end
@@ -266,6 +313,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#destroy" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:destroy) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     it "should not explode when asked to delete something that doesn't exist" do
       expect { subject.destroy('nonesuch') }.should_not raise_error
     end
@@ -303,6 +356,12 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#list" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:list) end
 
+    it "should set the password if the caexplicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
+      
     context "options" do
       subject { Puppet::Face[:ca, '0.1.0'].get_action(:list) }
       it { should be_option :pending }

@@ -76,31 +76,50 @@ describe Puppet::SSL::Key do
       @key.content.should equal(key)
     end
 
-    it "should not try to use the provided password file if the file does not exist" do
-      FileTest.stubs(:exist?).returns false
-      @key.password_file = "/path/to/password"
-
-      path = "/my/path"
-
-      File.stubs(:read).with(path).returns("my key")
-      OpenSSL::PKey::RSA.expects(:new).with("my key", nil).returns(mock('key'))
-      File.expects(:read).with("/path/to/password").never
-
-      @key.read(path)
+    context "and caexplicitpassphrase is false" do
+      it "should not try to use the provided password file if the file does not exist" do          
+        FileTest.stubs(:exist?).returns false
+        @key.password_file = "/path/to/password"
+  
+        path = "/my/path"
+  
+        File.stubs(:read).with(path).returns("my key")
+        OpenSSL::PKey::RSA.expects(:new).with("my key", nil).returns(mock('key'))
+        File.expects(:read).with("/path/to/password").never
+  
+        @key.read(path)
+      end
+  
+      it "should read the key with the password retrieved from the password file if one is provided" do
+        FileTest.stubs(:exist?).returns true
+        @key.password_file = "/path/to/password"
+  
+        path = "/my/path"
+        File.expects(:read).with(path).returns("my key")
+        File.expects(:read).with("/path/to/password").returns("my password")
+  
+        key = mock 'key'
+        OpenSSL::PKey::RSA.expects(:new).with("my key", "my password").returns(key)
+        @key.read(path).should equal(key)
+        @key.content.should equal(key)
+      end
     end
 
-    it "should read the key with the password retrieved from the password file if one is provided" do
-      FileTest.stubs(:exist?).returns true
-      @key.password_file = "/path/to/password"
-
-      path = "/my/path"
-      File.expects(:read).with(path).returns("my key")
-      File.expects(:read).with("/path/to/password").returns("my password")
-
-      key = mock 'key'
-      OpenSSL::PKey::RSA.expects(:new).with("my key", "my password").returns(key)
-      @key.read(path).should equal(key)
-      @key.content.should equal(key)
+    context " and caexplicitpassword is true" do
+      before do
+        Puppet.settings.stubs(:value).with(:caexplicitpassword).returns true                
+      end
+    
+      it "should read the key with the password passed in on the command line" do
+        pwd = '123456'
+        Puppet::SSL::Ca_password.expects(:password).returns(pwd)
+        path = "/my/path"        
+        File.expects(:read).with(path).returns("my key")        
+        @key.stubs(:ca?).returns(true)
+        OpenSSL::PKey::RSA.expects(:new).with('my key', pwd)
+                
+        @key.read(path)
+      end
     end
 
     it "should return an empty string when converted to a string with no key" do
@@ -158,14 +177,29 @@ describe Puppet::SSL::Key do
       @instance.to_s.should == "my normal key"
     end
 
-    describe "with a password file set" do
+    describe "with caexplicitpassword set to true" do
+      it "should export the private key to text using passed in the password" do
+        Puppet.settings.stubs(:value).with(:caexplicitpassword).returns true
+        Puppet.settings.stubs(:value).with(:keylength).returns("50")        
+        pwd = '123456'
+
+        @instance.stubs(:ca?).returns(true)
+        
+        Puppet::SSL::Ca_password.expects(:password).returns(pwd)
+                        
+        @instance.generate
+        @instance.to_s
+      end      
+    end
+
+    describe "with a password file set (caexplicitpassword is default false" do
       it "should return a nil password if the password file does not exist" do
         FileTest.expects(:exist?).with("/path/to/pass").returns false
         File.expects(:read).with("/path/to/pass").never
 
         @instance.password_file = "/path/to/pass"
 
-        @instance.password.should be_nil
+        @instance.read_password_file.should be_nil
       end
 
       it "should return the contents of the password file as its password" do
@@ -174,14 +208,14 @@ describe Puppet::SSL::Key do
 
         @instance.password_file = "/path/to/pass"
 
-        @instance.password.should == "my password"
+        @instance.read_password_file.should == "my password"
       end
 
       it "should export the private key to text using the password" do
         Puppet.settings.stubs(:value).with(:keylength).returns("50")
 
         @instance.password_file = "/path/to/pass"
-        @instance.stubs(:password).returns "my password"
+        @instance.stubs(:read_password_file).returns "my password"
 
         OpenSSL::PKey::RSA.expects(:new).returns(@key)
         @instance.generate

@@ -1,4 +1,6 @@
 require 'puppet/face'
+require 'puppet/util/password_utils'
+require 'puppet/ssl/ca_password'
 
 Puppet::Face.define(:ca, '0.1.0') do
   copyright "Puppet Labs", 2011
@@ -11,6 +13,11 @@ Puppet::Face.define(:ca, '0.1.0') do
 
     You can use this subcommand to sign outstanding certificate requests, list
     and manage local certificates, and inspect the state of the CA.
+
+    If the configuration parameter caexplicitpassword=true, then the user will prompted for a password for the 
+    CA private key when invoking generate or sign. The first invocation will create the CA private key, encrypted
+    using the entered password. Subsequent invocations will use the password to encrypt the private key and sign the certificate. 
+    
   TEXT
 
   action :list do
@@ -47,6 +54,7 @@ Puppet::Face.define(:ca, '0.1.0') do
 
     when_invoked do |options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -96,6 +104,7 @@ Puppet::Face.define(:ca, '0.1.0') do
   action :destroy do
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -107,6 +116,7 @@ Puppet::Face.define(:ca, '0.1.0') do
   action :revoke do
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -131,6 +141,7 @@ Puppet::Face.define(:ca, '0.1.0') do
 
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -158,8 +169,9 @@ Puppet::Face.define(:ca, '0.1.0') do
       summary "Whether or not to accept DNS alt names in the certificate request"
     end
 
-    when_invoked do |host, options|
+    when_invoked do |host, options|     
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -179,6 +191,7 @@ Puppet::Face.define(:ca, '0.1.0') do
   action :print do
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -194,6 +207,7 @@ Puppet::Face.define(:ca, '0.1.0') do
 
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end
@@ -216,6 +230,7 @@ Puppet::Face.define(:ca, '0.1.0') do
   action :verify do
     when_invoked do |host, options|
       raise "Not a CA" unless Puppet::SSL::CertificateAuthority.ca?
+      Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false      
       unless ca = Puppet::SSL::CertificateAuthority.instance
         raise "Unable to fetch the CA"
       end

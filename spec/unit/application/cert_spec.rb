@@ -51,7 +51,7 @@ describe Puppet::Application::Cert => true do
     @cert_app.handle_signed(0)
     @cert_app.signed.should be_true
   end
-
+  
   Puppet::SSL::CertificateAuthority::Interface::INTERFACE_METHODS.reject { |m| m == :destroy }.each do |method|
     it "should set cert_mode to #{method} with option --#{method}" do
       @cert_app.send("handle_#{method}".to_sym, nil)
@@ -68,6 +68,16 @@ describe Puppet::Application::Cert => true do
       Puppet::SSL::CertificateAuthority.stubs(:new)
     end
 
+    it "should set the password if the caexplicitpassword setting is true" do    
+      Puppet.settings.stubs(:print_configs?).returns(false)    
+      Puppet.settings.stubs(:value).with(:caexplicitpassword).returns 'true'                
+
+      Puppet::Util::Password_utils.expects(:capturepassword).returns('123456')
+      Puppet::SSL::Ca_password.expects(:password=).with('123456')
+      Puppet::SSL::CertificateAuthority.expects(:new)
+      @cert_app.setup        
+    end
+    
     it "should set console as the log destination" do
       Puppet::Log.expects(:newdestination).with(:console)
 

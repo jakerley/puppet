@@ -41,7 +41,14 @@ module Puppet
     :run_mode => {
         :default  => nil,
         :desc     => "The effective 'run mode' of the application: master, agent, or user.",
-    }
+    },
+    ## If this is true, any puppet ca or cert invocations that read or write the ca private key 
+    ## will require a password entered on stdin
+    ## --jakerley 2012-5-22
+    :caexplicitpassword  => {
+        :default  => false,
+        :desc     => "Whether certificate signing requires a passed in password.",
+    }        
   )
 
   define_settings(:main,
