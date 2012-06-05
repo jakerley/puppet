@@ -131,7 +131,7 @@ file is also a valid long argument. For example, 'ssldir' is a valid
 configuration parameter, so you can specify '--ssldir <directory>' as an
 argument.
 
-If the configuration parameter caexplicitpassword=true, then the user will prompted for a password for the 
+If the configuration parameter ca_explicitpassword=true, then the user will prompted for a password for the 
 CA private key when invoking generate or sign. The first invocation will create the CA private key, encrypted
 using the entered password. Subsequent invocations will use the password to encrypt the private key and sign the certificate. 
 
@@ -202,7 +202,7 @@ Copyright (c) 2011 Puppet Labs, LLC Licensed under the Apache 2.0 License
   def setup
     require 'puppet/ssl/certificate_authority'
     exit(Puppet.settings.print_configs ? 0 : 1) if Puppet.settings.print_configs?
-    Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :caexplicitpassword] == false    
+    Puppet::SSL::Ca_password.password = Puppet::Util::Password_utils.capturepassword unless Puppet.settings[ :ca_explicitpassword] == false    
     Puppet::Util::Log.newdestination :console
 
     if [:generate, :destroy].include? subcommand

@@ -68,9 +68,9 @@ describe Puppet::Application::Cert => true do
       Puppet::SSL::CertificateAuthority.stubs(:new)
     end
 
-    it "should set the password if the caexplicitpassword setting is true" do    
+    it "should set the password if the ca_explicitpassword setting is true" do    
       Puppet.settings.stubs(:print_configs?).returns(false)    
-      Puppet.settings.stubs(:value).with(:caexplicitpassword).returns 'true'                
+      Puppet.settings.stubs(:value).with(:ca_explicitpassword).returns 'true'                
 
       Puppet::Util::Password_utils.expects(:capturepassword).returns('123456')
       Puppet::SSL::Ca_password.expects(:password=).with('123456')

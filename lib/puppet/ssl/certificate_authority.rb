@@ -217,7 +217,11 @@ class Puppet::SSL::CertificateAuthority
 
   # Does the password file exist?
   def password?
-    FileTest.exist? Puppet[:capass]
+    if( Puppet[:ca] && Puppet.run_mode.master?  && Puppet.settings[ :ca_explicitpassword] == true)
+      Puppet::SSL::Ca_password.password != nil 
+    else
+      FileTest.exist? Puppet[:capass]
+    end
   end
 
   # Print a given host's certificate as text.

@@ -41,14 +41,7 @@ module Puppet
     :run_mode => {
         :default  => nil,
         :desc     => "The effective 'run mode' of the application: master, agent, or user.",
-    },
-    ## If this is true, any puppet ca or cert invocations that read or write the ca private key 
-    ## will require a password entered on stdin
-    ## --jakerley 2012-5-22
-    :caexplicitpassword  => {
-        :default  => false,
-        :desc     => "Whether certificate signing requires a passed in password.",
-    }        
+    }
   )
 
   define_settings(:main,
@@ -683,7 +676,22 @@ EOT
       :owner => "service",
       :group => "service",
       :desc => "A Complete listing of all certificates"
-    }
+    },
+    ## If this is true, any puppet ca or cert invocations that read or write the ca private key 
+    ## will require a password entered on stdin
+    ## --jakerley 2012-5-22
+    :ca_explicitpassword  => {
+        :default  => false,
+        :desc     => "Whether certificate signing requires a passed in password.",
+    },
+    ## The algorithm for encrypting the CA private key, defaults to DES, allowable values,
+    ## See: http://www.openssl.org/docs/apps/enc.html
+    ## See: http://www.ruby-doc.org/stdlib-1.9.3/libdoc/openssl/rdoc/OpenSSL/Cipher.html
+    ## --jakerley 2012-6-1    
+    :ca_pwdalg => {
+      :default    => "DES-EDE3-CBC",
+      :desc       => "The type of hash used in certificates.",
+    }            
   )
 
   # Define the config default.

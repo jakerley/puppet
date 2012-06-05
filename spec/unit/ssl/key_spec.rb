@@ -105,9 +105,9 @@ describe Puppet::SSL::Key do
       end
     end
 
-    context " and caexplicitpassword is true" do
+    context " and ca_explicitpassword is true" do
       before do
-        Puppet.settings.stubs(:value).with(:caexplicitpassword).returns true                
+        Puppet.settings.stubs(:value).with(:ca_explicitpassword).returns true                
       end
     
       it "should read the key with the password passed in on the command line" do
@@ -177,9 +177,10 @@ describe Puppet::SSL::Key do
       @instance.to_s.should == "my normal key"
     end
 
-    describe "with caexplicitpassword set to true" do
-      it "should export the private key to text using passed in the password" do
-        Puppet.settings.stubs(:value).with(:caexplicitpassword).returns true
+    describe "with ca_explicitpassword set to true" do
+      it "should export the private key to text using the passed in the password" do
+        Puppet.settings.stubs(:value).with(:ca_explicitpassword).returns true
+        Puppet.settings.stubs(:value).with(:ca_pwdalg).returns "AES-256-CBC"        
         Puppet.settings.stubs(:value).with(:keylength).returns("50")        
         pwd = '123456'
 
@@ -192,7 +193,7 @@ describe Puppet::SSL::Key do
       end      
     end
 
-    describe "with a password file set (caexplicitpassword is default false" do
+    describe "with a password file set (ca_explicitpassword is default false" do
       it "should return a nil password if the password file does not exist" do
         FileTest.expects(:exist?).with("/path/to/pass").returns false
         File.expects(:read).with("/path/to/pass").never
@@ -212,17 +213,17 @@ describe Puppet::SSL::Key do
       end
 
       it "should export the private key to text using the password" do
+        pwdalg = 'DES-EDE3-CBC'        
         Puppet.settings.stubs(:value).with(:keylength).returns("50")
-
-        @instance.password_file = "/path/to/pass"
-        @instance.stubs(:read_password_file).returns "my password"
+        Puppet.settings.stubs(:value).with(:ca_pwdalg).returns pwdalg
+        @instance.stubs(:read_password_file).returns("my password")        
 
         OpenSSL::PKey::RSA.expects(:new).returns(@key)
+        cipher = mock 'cipher'        
+        OpenSSL::Cipher.expects(:new).with( pwdalg).returns cipher
+        @key.expects(:export).with(cipher, "my password").returns "my encrypted key"                
+        
         @instance.generate
-
-        cipher = mock 'cipher'
-        OpenSSL::Cipher::DES.expects(:new).with(:EDE3, :CBC).returns cipher
-        @key.expects(:export).with(cipher, "my password").returns "my encrypted key"
 
         @instance.to_s.should == "my encrypted key"
       end

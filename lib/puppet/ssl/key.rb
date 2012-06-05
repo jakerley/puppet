@@ -41,7 +41,7 @@ class Puppet::SSL::Key < Puppet::SSL::Base
 
   # Optionally support specifying a password file.
   def read(path)
-    if ca? && Puppet.settings[ :caexplicitpassword] == true 
+    if ca? && Puppet.settings[ :ca_explicitpassword] == true 
       @content = wrapped_class.new(::File.read(path), Puppet::SSL::Ca_password.password)
     else
       return super unless password_file
@@ -50,11 +50,11 @@ class Puppet::SSL::Key < Puppet::SSL::Base
   end
 
   def to_s
-    if ca? && Puppet.settings[ :caexplicitpassword] == true   
-      @content.export(OpenSSL::Cipher::DES.new(:EDE3, :CBC), Puppet::SSL::Ca_password.password)        
+    if ca? && Puppet.settings[ :ca_explicitpassword] == true         
+      @content.export(OpenSSL::Cipher.new( Puppet.settings[ :ca_pwdalg]), Puppet::SSL::Ca_password.password)    
     else
       if pass = read_password_file
-        @content.export(OpenSSL::Cipher::DES.new(:EDE3, :CBC), pass)
+        @content.export(OpenSSL::Cipher.new( Puppet.settings[ :ca_pwdalg]), pass)
       else
         return super
       end

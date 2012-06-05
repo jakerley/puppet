@@ -26,7 +26,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
     Puppet::SSL::CertificateAuthority.stubs(:new).returns ca
     Puppet::SSL::CertificateAuthority.stubs(:instance).returns ca
     Puppet.settings.stubs(:value).with(:ca).returns('ca')            
-    Puppet.settings.stubs(:value).with(:caexplicitpassword).returns 'true'
+    Puppet.settings.stubs(:value).with(:ca_explicitpassword).returns 'true'
     Puppet::Util::Password_utils.expects(:capturepassword).returns('123456')
     Puppet::SSL::Ca_password.expects(:password=).with('123456')
     ca
@@ -45,7 +45,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#verify" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:verify) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -103,11 +103,11 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#fingerprint" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:fingerprint) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
-    @ca = setup_password()
-    @ca.expects(:verify)    
-    subject.verify('random-host')            
-  end
+    it "should set the password if the ca_explicitpassword setting is true" do
+      @ca = setup_password()
+      @ca.expects(:verify)    
+      subject.verify('random-host')            
+    end
 
     it "should have a 'digest' option" do
       action.should be_option :digest
@@ -148,7 +148,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#print" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:print) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -180,7 +180,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#sign" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:sign) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -237,7 +237,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#generate" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:generate) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -282,7 +282,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#revoke" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:revoke) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -313,7 +313,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#destroy" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:destroy) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
@@ -356,7 +356,7 @@ describe Puppet::Face[:ca, '0.1.0'], :unless => Puppet.features.microsoft_window
   context "#list" do
     let :action do Puppet::Face[:ca, '0.1.0'].get_action(:list) end
 
-    it "should set the password if the caexplicitpassword setting is true" do
+    it "should set the password if the ca_explicitpassword setting is true" do
       @ca = setup_password()
       @ca.expects(:verify)    
       subject.verify('random-host')            
