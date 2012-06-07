@@ -3,10 +3,9 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'tasks')
 
 require 'rake'
-require 'rake/packagetask'
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 require 'rspec'
-require "rspec/core/rake_task"
+require 'rspec/core/rake_task'
 
 module Puppet
     PUPPETVERSION = File.read('lib/puppet.rb')[/PUPPETVERSION *= *'(.*)'/,1] or fail "Couldn't find PUPPETVERSION"
