@@ -147,6 +147,13 @@ describe Puppet::Application::Cert => true do
 
       @cert_app.main
     end
+    
+    it "should read the hosts from the hostfile if --hostfile file is passed on the command line" do
+      @cert_app.handle_hostfile("file")
+      File.expects(:open).returns("fh")
+      
+      @cert_app.main
+    end    
 
     it "should delegate to ca.apply with the hosts given on command line" do
       @cert_app.command_line.stubs(:args).returns(["host"])

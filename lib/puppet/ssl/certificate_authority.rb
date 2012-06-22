@@ -1,6 +1,7 @@
 require 'monitor'
 require 'puppet/ssl/host'
 require 'puppet/ssl/certificate_request'
+require 'socket'
 
 # The class that knows how to sign certificates.  It creates
 # a 'special' SSL::Host whose name is 'ca', thus indicating
@@ -128,6 +129,13 @@ class Puppet::SSL::CertificateAuthority
   # Generate a new certificate.
   def generate(name, options = {})
     raise ArgumentError, "A Certificate already exists for #{name}" if Puppet::SSL::Certificate.indirection.find(name)
+    if( Puppet[:validate_dns])
+      begin
+        Socket.gethostbyname( name)
+      rescue Exception => e  
+        raise Puppet::Error, "A host must exist in DNS to generate a certificate for it."
+      end 
+    end
     host = Puppet::SSL::Host.new(name)
 
     # Pass on any requested subjectAltName field.

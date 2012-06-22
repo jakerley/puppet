@@ -860,7 +860,15 @@ describe Puppet::SSL::CertificateAuthority do
 
         lambda { @ca.generate("him") }.should raise_error(ArgumentError)
       end
-
+      
+      describe "and validate_dns is true" do
+        it "should create a new Host instance with the correct name" do
+          Socket.expects(:gethostbyname).with("him")
+          Puppet.settings.stubs(:value).with(:validate_dns).returns true    
+          @ca.generate("him")
+        end        
+      end
+      
       it "should create a new Host instance with the correct name" do
         Puppet::SSL::Host.expects(:new).with("him").returns @host
 

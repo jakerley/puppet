@@ -539,7 +539,7 @@ EOT
     }
   )
 
-    define_settings(
+  define_settings(
     :ca,
     :ca_name => {
       :default    => "Puppet CA: $certname",
@@ -691,7 +691,13 @@ EOT
     :ca_pwdalg => {
       :default    => "DES-EDE3-CBC",
       :desc       => "The type of hash used in certificates.",
-    }            
+    },
+    ## Flag that forces dns lookup before generating a certificate
+    ## --jakerley 2012-6-20    
+    :validate_dns => {
+      :default  => false,
+      :desc     => "If true, force dns lookup before generating a certificate.",      
+    }
   )
 
   # Define the config default.

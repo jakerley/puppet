@@ -28,7 +28,7 @@ Print the DIGEST (defaults to md5) fingerprint of a host\'s certificate\.
 .
 .TP
 generate
-Generate a certificate for a named client\. A certificate/keypair will be generated for each client named on the command line\.
+Generate a certificate for a named client\. A certificate/keypair will be generated for each client named on the command line or in the passed hostfile\.
 .
 .TP
 list
@@ -71,6 +71,10 @@ Enable full debugging\.
 .TP
 \-\-help
 Print this help message
+.
+.TP
+\-\-hostfile
+Pass a file containing a list of hosts for which certificates will be generated.
 .
 .TP
 \-\-verbose

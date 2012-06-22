@@ -6,7 +6,7 @@ class Puppet::Application::Cert < Puppet::Application
 
   run_mode :master
 
-  attr_accessor :all, :ca, :digest, :signed
+  attr_accessor :all, :ca, :digest, :signed, :hostfile
 
   def subcommand
     @subcommand
@@ -30,6 +30,11 @@ class Puppet::Application::Cert < Puppet::Application
     @digest = arg
   end
 
+  # Pass a list of hostnames, 1 per line
+  option("--hostfile HOSTFILE") do |arg|
+    @hostfile = arg
+  end
+  
   option("--signed", "-s") do |arg|
     @signed = true
   end
@@ -187,6 +192,12 @@ Copyright (c) 2011 Puppet Labs, LLC Licensed under the Apache 2.0 License
       hosts = :all
     elsif @signed
       hosts = :signed
+    elsif @hostfile
+      f = File.open( @hostfile) or raise ArgumentError( "Unable to open hostfile: " + @hostfile)
+      hosts = []
+      f.each_line {|line|
+        hosts.push line.downcase
+      }
     else
       hosts = command_line.args.collect { |h| h.downcase }
     end
