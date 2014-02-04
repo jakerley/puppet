@@ -18,6 +18,9 @@ require 'mocha'
 gem 'rspec', '>=2.0.0'
 require 'rspec/expectations'
 
+# default Mocha option is :stubbing_method_on_nil => :prevent
+Mocha::Configuration.allow(:stubbing_method_on_nil)
+
 # So everyone else doesn't have to include this base constant.
 module PuppetSpec
   FIXTURE_DIR = File.join(dir = File.expand_path(File.dirname(__FILE__)), "fixtures") unless defined?(FIXTURE_DIR)
